@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!--
+Copyright (C) 2018 Rémi Venant $lt;remi.venant@gmail.com$gt;.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301  USA
+-->
+<html lang="fr">
+    <head>
+        <title>The Miage Calculator</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+        <!-- CSS Bootstrap -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+        <!-- Jquery for boostrap and Angular, Pooper for Boostrap, Boostrap JS itself and AngularJS itself -->
+        <script defer src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script defer src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script defer src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.7/angular.min.js"></script>
+        
+        <!-- Out JS for angular app -->
+        <script defer src="calculetteAngular.js" type="text/javascript"></script>
+    </head>
+    <body style="padding-top: 70px" ng-app="calculetteMiageApp"> <!-- Déclaration de l'application (module) Angular à utiliser -->
+        <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+            <a class="navbar-brand" href="#">Calculette Miage</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Calculette</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Historique</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <main>
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-6">
+                       <form name="calculetteForm" ng-controller="CalculetteCtrl"> <!-- déclaration du controlleur associé à cet élément <form> : une instance de CalculetteCtrl -->
+                            <div class="form-group row">
+                                <label for="operande1" class="col-12 col-sm-2 col-md-12 col-lg-2 col-form-label">Op. 1</label>
+                                <div class="col-12 col-sm-4 col-md-12 col-lg-4">
+                                   <input type="number" step="any" class="form-control" placeholder="0" autofocus required tabindex="1" id="operande1" ng-model="operation.op1"> <!-- 2-ways data-binding entre l'input et la variable operation.op1 du scope du controlleur -->
+                                </div>
+                                <label for="operande2" class="col-12 col-sm-2 col-md-12 col-lg-2 col-form-label">Op. 2</label>
+                                <div class="col-12 col-sm-4 col-md-12 col-lg-4">
+                                    <input type="number" step="any" class="form-control" placeholder="0" required tabindex="2" id="operande2" ng-model="operation.op2">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="resultat" class="col-12 col-sm-2 col-md-4 col-lg-2 col-form-label">Résultat</label>
+                                <div class="col-12 col-sm-10 col-md-8 col-lg-10">
+                                    <input type="text" class="form-control" readonly tabindex="-1" id="resultat" ng-model="operation.res">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-6">
+                                    <!-- ng-click: directive angular pour associer un traitement du scope à l'evenement click de l'élément du DOM -->
+                                    <!-- ng-disabled: directive angular pour desactiver l'element selon la condition. Ici la condition est calculé automatiquement par angular : 
+                                    le formulaire est calculetteForm est considéré invalide si au moins un des input/select/textera n'a pas été rempli correctement (cf. type, required...)-->
+                                    <button type="button" class="btn btn-primary btn-block" tabindex="3" ng-click="computeOperation('+')" ng-disabled="calculetteForm.$invalid">+</button>
+                                    <button type="button" class="btn btn-primary btn-block" tabindex="4" ng-click="computeOperation('-')" ng-disabled="calculetteForm.$invalid">-</button>
+                                </div>
+                                <div class="col-6 col-sm-6">
+                                    <button type="button" class="btn btn-primary btn-block" tabindex="5" ng-click="computeOperation('*')" ng-disabled="calculetteForm.$invalid">*</button>
+                                    <!-- Pour l'operation divisé, on desactive aussi le bouton si l'operande 2 est nulle -->
+                                    <button type="button" class="btn btn-primary btn-block" tabindex="6" ng-click="computeOperation('/')" ng-disabled="calculetteForm.$invalid || operation.op2 - 0.0 === 0">/</button>
+                                </div>
+                            </div>
+                        </form> <!-- le champ d'action de notre instance du controlleur CalculetteCtrl (et de son scope) s'arrête ici-->
+                        <form name="memoryForm" ng-controller="MemoryCtrl">  <!-- déclaration du controlleur associé à l'élément -->
+                            <div class="row">
+                                <div class="form-group col-12 col-sm-5 col-md-7 col-lg-5">
+                                    <button type="button" class="btn btn-success btn-block" tabindex="7" ng-click="saveMemory()" ng-disabled="!canSaveMemory()">Mémoriser</button>
+                                    <button type="button" class="btn btn-success btn-block" tabindex="8" ng-click="loadMemory()" ng-disabled="!data.memory && data.memory !== 0">Charger la mémoire</button>
+                                    <!-- attention !data.memory retournera vrai s'il la variable data.memory n'existe pas, est undefined, null ou est égale à 0. Il faut donc ajouter un teste pour s'assurer que la memoire puisse être égale à 0-->
+                                </div>
+                                <div class="form-group col-12 col-sm-5 offset-sm-2 col-md-5 offset-md-0 offset-lg-2">
+                                    <label for="memory">En mémoire</label>
+                                    <input type="text" class="form-control" readonly tabindex="-1" id="memory" ng-model="data.memory">
+                                </div>
+                            </div>
+                        </form> <!-- le champ d'action de notre instance du controlleur MemoryCtrl (et de son scope) s'arrête ici-->
+                    </div> 
+                    <div class="col-12 col-sm-12 col-md-6" ng-controller="HistoryCtrl">
+                        <div class="card text-white bg-secondary">
+                            <h5 class="card-header">Mes 10 dernières opérations</h5>
+                            <div class="card-body" ng-if="!history.length"> <!--Affiche cette alerte uniquement si l'historique est vide -->
+                                <div class="alert alert-danger" role="alert">Votre historique est vide !</div>
+                            </div>
+                            <div class="list-group list-group-flush">
+                                <!-- Affiche autant d'élement <a> qu'il y a d'operation dans l'historique, et les affiche par ordre du plus récent aux plus vieux avec une limite à 10 élements -->
+                                <a href="#" class="list-group-item bg-secondary text-white" 
+                                   ng-repeat="operation in history| orderBy:'+':true | limitTo:10" 
+                                   ng-click="loadOperation(operation)">{{operation.op1 | number : 3}} {{operation.operator}} {{operation.op2 | number : 3}} = {{operation.res | number : 3}}</a>
+                            </div>
+                            <div class="card-body" ng-if="history.length"> <!--Affiche cet élement uniquement si l'historique n'est pas vide -->
+                                <a href="#" class="btn btn-danger btn-sm" ng-click="resetHistory()">Effacer l'historique</a>
+                            </div>
+                        </div>
+                    </div> <!-- le champ d'action de notre instance du controlleur HistoryCtrl (et de son scope) s'arrête ici-->
+                </div> 
+            </div> 
+        </main>
+    </body>
+</html>
